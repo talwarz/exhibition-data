@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exhibition Data Collection</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #111827, #1f2937);
+      color: #111827;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      margin-bottom: 20px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    h1 {
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 12px 0 6px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    .primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .success {
+      background: #16a34a;
+      color: white;
+    }
+
+    .danger {
+      background: #dc2626;
+      color: white;
+    }
+
+    .dark {
+      background: #111827;
+      color: white;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: #f3f4f6;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2563eb;
+    }
+
+    .stat-label {
+      margin-top: 6px;
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 10px;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #111827;
+      color: white;
+    }
+
+    .message {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .error {
+      color: #dc2626;
+    }
+
+    .ok {
+      color: #16a34a;
+    }
+
+    @media (max-width: 700px) {
+      .row,
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Exhibition Customer Data Collection</h1>
+
+    <div id="loginPage" class="card">
+      <h2>Login</h2>
+      <p>Employees can add customer data. Admin can export, delete, and create employee accounts.</p>
+
+      <label>Username</label>
+      <input id="loginUsername" type="text" placeholder="Enter username" />
+
+      <label>Password</label>
+      <input id="loginPassword" type="password" placeholder="Enter password" />
+
+      <button class="primary" onclick="login()">Login</button>
+      <p id="loginMessage" class="message"></p>
+
+      <hr />
+      <p><b>Default Admin Login:</b></p>
+      <p>Username: <b>admin</b><br />Password: <b>admin@123</b></p>
+    </div>
+
+    <div id="appPage" class="hidden">
+      <div class="card topbar">
+        <div>
+          <h2 style="margin-bottom: 5px;">Customer Entry Form</h2>
+          <span class="badge">Logged in as: <b id="currentUserText"></b></span>
+          <span class="badge">Role: <b id="currentRoleText"></b></span>
+        </div>
+        <button class="secondary" onclick="logout()">Logout</button>
+      </div>
+
+      <div class="card">
+        <h3>Add Customer Data</h3>
+
+        <div class="row">
+          <div>
+            <label>Customer Name</label>
+            <input id="customerName" type="text" placeholder="Enter customer name" />
+          </div>
+
+          <div>
+            <label>Mobile Number</label>
+            <input id="mobileNumber" type="tel" maxlength="10" placeholder="10 digit mobile number" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" />
+          </div>
+        </div>
+
+        <label>Notes</label>
+        <textarea id="notes" placeholder="Feed customer notes here"></textarea>
+
+        <button class="success" onclick="saveCustomer()">Save Data</button>
+        <p id="formMessage" class="message"></p>
+      </div>
+
+      <div class="card">
+        <h3>Data Count</h3>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div id="totalLeadsCount" class="stat-number">0</div>
+            <div class="stat-label">Total Entries</div>
+          </div>
+          <div class="stat-box">
+            <div id="todayLeadsCount" class="stat-number">0</div>
+            <div class="stat-label">Today's Entries</div>
+          </div>
+          <div class="stat-box">
+            <div id="myLeadsCount" class="stat-number">0</div>
+            <div class="stat-label">My Entries</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>All Customer Entries</h3>
+        <p>All logged-in users can view the full customer entry list.</p>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Notes</th>
+                <th>Added By</th>
+                <th>Date & Time</th>
+                <th id="publicActionHead" class="hidden">Action</th>
+              </tr>
+            </thead>
+            <tbody id="publicRecordsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="adminPanel" class="card hidden">
+        <h3>Admin Panel</h3>
+
+        <div class="row">
+          <button class="primary" onclick="exportToExcel()">Export Data to Excel</button>
+          <button class="danger" onclick="deleteAllData()">Delete All Customer Data</button>
+        </div>
+
+        <hr />
+
+        <h3>Create Employee User</h3>
+        <div class="row">
+          <div>
+            <label>New Username</label>
+            <input id="newUsername" type="text" placeholder="Employee username" />
+          </div>
+          <div>
+            <label>New Password</label>
+            <input id="newPassword" type="text" placeholder="Employee password" />
+          </div>
+        </div>
+        <button class="dark" onclick="createUser()">Create User</button>
+        <p id="userMessage" class="message"></p>
+
+        <hr />
+
+        <h3>Customer Records</h3>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Notes</th>
+                <th>Added By</th>
+                <th>Date & Time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="recordsTable"></tbody>
+          </table>
+        </div>
+
+        <hr />
+
+        <h3>Employee Users</h3>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_USERS = "exhibition_users";
+    const STORAGE_DATA = "exhibition_customer_data";
+    let currentUser = null;
+
+    function setupDefaultUsers() {
+      const users = JSON.parse(localStorage.getItem(STORAGE_USERS)) || [];
+      if (users.length === 0) {
+        users.push({ username: "admin", password: "admin@123", role: "admin" });
+        users.push({ username: "user1", password: "rock@123", role: "employee" });
+        for (let i = 2; i <= 10; i++) {
+          users.push({ username: "user" + i, password: "hello", role: "employee" });
+        }
+        localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
+      }
+    }
+
+    function login() {
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+      const msg = document.getElementById("loginMessage");
+      const users = JSON.parse(localStorage.getItem(STORAGE_USERS)) || [];
+
+      const foundUser = users.find(u => u.username === username && u.password === password);
+
+      if (!foundUser) {
+        msg.textContent = "Wrong username or password.";
+        msg.className = "message error";
+        return;
+      }
+
+      currentUser = foundUser;
+      document.getElementById("loginPage").classList.add("hidden");
+      document.getElementById("appPage").classList.remove("hidden");
+      document.getElementById("currentUserText").textContent = currentUser.username;
+      document.getElementById("currentRoleText").textContent = currentUser.role;
+
+      if (currentUser.role === "admin") {
+        document.getElementById("adminPanel").classList.remove("hidden");
+        renderRecords();
+        renderUsers();
+      } else {
+        document.getElementById("adminPanel").classList.add("hidden");
+      }
+
+      renderPublicRecords();
+      updateCounts();
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById("loginPage").classList.remove("hidden");
+      document.getElementById("appPage").classList.add("hidden");
+      document.getElementById("loginUsername").value = "";
+      document.getElementById("loginPassword").value = "";
+      document.getElementById("loginMessage").textContent = "";
+    }
+
+    function saveCustomer() {
+      const name = document.getElementById("customerName").value.trim();
+      const mobile = document.getElementById("mobileNumber").value.trim();
+      const notes = document.getElementById("notes").value.trim();
+      const msg = document.getElementById("formMessage");
+
+      if (!name) {
+        msg.textContent = "Please enter customer name.";
+        msg.className = "message error";
+        return;
+      }
+
+      if (!/^\d{10}$/.test(mobile)) {
+        msg.textContent = "Mobile number must be exactly 10 digits. No less, no more.";
+        msg.className = "message error";
+        return;
+      }
+
+      const data = JSON.parse(localStorage.getItem(STORAGE_DATA)) || [];
+      const now = new Date();
+      data.push({
+        name,
+        mobile,
+        notes,
+        addedBy: currentUser.username,
+        dateTime: now.toLocaleString(),
+        dateKey: getTodayKey()
+      });
+
+      localStorage.setItem(STORAGE_DATA, JSON.stringify(data));
+
+      document.getElementById("customerName").value = "";
+      document.getElementById("mobileNumber").value = "";
+      document.getElementById("notes").value = "";
+
+      msg.textContent = "Data saved successfully.";
+      msg.className = "message ok";
+
+      renderPublicRecords();
+      updateCounts();
+      if (currentUser.role === "admin") renderRecords();
+    }
+
+    function getTodayKey() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function getRecordDateKey(item) {
+      if (item.dateKey) return item.dateKey;
+
+      // Fallback for old saved records before dateKey was added
+      const savedDate = item.dateTime || "";
+      const todayIndianFormat = new Date().toLocaleDateString();
+      if (savedDate.startsWith(todayIndianFormat)) return getTodayKey();
+
+      return "";
+    }
+
+    function updateCounts() {
+      const data = JSON.parse(localStorage.getItem(STORAGE_DATA)) || [];
+      const todayKey = getTodayKey();
+      const todayCount = data.filter(item => getRecordDateKey(item) === todayKey).length;
+      const myCount = currentUser ? data.filter(item => item.addedBy === currentUser.username).length : 0;
+
+      document.getElementById("totalLeadsCount").textContent = data.length;
+      document.getElementById("todayLeadsCount").textContent = todayCount;
+      document.getElementById("myLeadsCount").textContent = myCount;
+    }
+
+    function renderPublicRecords() {
+      const data = JSON.parse(localStorage.getItem(STORAGE_DATA)) || [];
+      const tbody = document.getElementById("publicRecordsTable");
+      const actionHead = document.getElementById("publicActionHead");
+      tbody.innerHTML = "";
+
+      if (currentUser && currentUser.role === "admin") {
+        actionHead.classList.remove("hidden");
+      } else {
+        actionHead.classList.add("hidden");
+      }
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${currentUser && currentUser.role === "admin" ? 7 : 6}">No customer data found.</td></tr>`;
+        return;
+      }
+
+      data.forEach((item, index) => {
+        const adminDeleteButton = currentUser && currentUser.role === "admin"
+          ? `<td><button class="danger" onclick="deleteSingleRecord(${index})">Delete</button></td>`
+          : "";
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(item.name)}</td>
+            <td>${escapeHtml(item.mobile)}</td>
+            <td>${escapeHtml(item.notes || "")}</td>
+            <td>${escapeHtml(item.addedBy)}</td>
+            <td>${escapeHtml(item.dateTime)}</td>
+            ${adminDeleteButton}
+          </tr>
+        `;
+      });
+    }
+
+    function renderRecords() {
+      const data = JSON.parse(localStorage.getItem(STORAGE_DATA)) || [];
+      const tbody = document.getElementById("recordsTable");
+      tbody.innerHTML = "";
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7">No customer data found.</td></tr>`;
+        return;
+      }
+
+      data.forEach((item, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(item.name)}</td>
+            <td>${escapeHtml(item.mobile)}</td>
+            <td>${escapeHtml(item.notes || "")}</td>
+            <td>${escapeHtml(item.addedBy)}</td>
+            <td>${escapeHtml(item.dateTime)}</td>
+            <td><button class="danger" onclick="deleteSingleRecord(${index})">Delete</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function exportToExcel() {
+      const data = JSON.parse(localStorage.getItem(STORAGE_DATA)) || [];
+
+      if (data.length === 0) {
+        alert("No data to export.");
+        return;
+      }
+
+      let table = `
+        <table border="1">
+          <tr>
+            <th>Customer Name</th>
+            <th>Mobile Number</th>
+            <th>Notes</th>
+            <th>Added By</th>
+            <th>Date & Time</th>
+          </tr>
+      `;
+
+      data.forEach(item => {
+        table += `
+          <tr>
+            <td>${escapeHtml(item.name)}</td>
+            <td>${escapeHtml(item.mobile)}</td>
+            <td>${escapeHtml(item.notes || "")}</td>
+            <td>${escapeHtml(item.addedBy)}</td>
+            <td>${escapeHtml(item.dateTime)}</td>
+          </tr>
+        `;
+      });
+
+      table += "</table>";
+
+      const blob = new Blob([table], { type: "application/vnd.ms-excel" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "exhibition_customer_data.xls";
+      link.click();
+    }
+
+    function deleteAllData() {
+      if (!confirm("Are you sure you want to delete all customer data?")) return;
+      localStorage.removeItem(STORAGE_DATA);
+      renderPublicRecords();
+      updateCounts();
+      renderRecords();
+    }
+
+    function deleteSingleRecord(index) {
+      if (!confirm("Delete this customer record?")) return;
+      const data = JSON.parse(localStorage.getItem(STORAGE_DATA)) || [];
+      data.splice(index, 1);
+      localStorage.setItem(STORAGE_DATA, JSON.stringify(data));
+      renderPublicRecords();
+      updateCounts();
+      renderRecords();
+    }
+
+    function createUser() {
+      const username = document.getElementById("newUsername").value.trim();
+      const password = document.getElementById("newPassword").value.trim();
+      const msg = document.getElementById("userMessage");
+      const users = JSON.parse(localStorage.getItem(STORAGE_USERS)) || [];
+
+      if (!username || !password) {
+        msg.textContent = "Please enter username and password.";
+        msg.className = "message error";
+        return;
+      }
+
+      if (users.some(u => u.username === username)) {
+        msg.textContent = "This username already exists.";
+        msg.className = "message error";
+        return;
+      }
+
+      users.push({ username, password, role: "employee" });
+      localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
+
+      document.getElementById("newUsername").value = "";
+      document.getElementById("newPassword").value = "";
+
+      msg.textContent = "Employee user created successfully.";
+      msg.className = "message ok";
+      renderUsers();
+    }
+
+    function renderUsers() {
+      const users = JSON.parse(localStorage.getItem(STORAGE_USERS)) || [];
+      const tbody = document.getElementById("usersTable");
+      tbody.innerHTML = "";
+
+      users.forEach((user, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(user.username)}</td>
+            <td>${escapeHtml(user.role)}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    setupDefaultUsers();
+  </script>
+</body>
+</html>
